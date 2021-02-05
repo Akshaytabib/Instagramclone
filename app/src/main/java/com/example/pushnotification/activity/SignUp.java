@@ -64,9 +64,9 @@ public class SignUp extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String username=name.getText().toString().trim();
-                String useremail=email.getText().toString().trim();
-                String userpassword=password.getText().toString().trim();
+                final String username=name.getText().toString().trim();
+                final String useremail=email.getText().toString().trim();
+                final String userpassword=password.getText().toString().trim();
 
                 firebaseAuth.createUserWithEmailAndPassword(useremail,userpassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override

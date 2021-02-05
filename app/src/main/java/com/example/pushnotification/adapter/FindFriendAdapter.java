@@ -74,7 +74,7 @@ public class FindFriendAdapter extends RecyclerView.Adapter<FindFriendAdapter.Vi
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     categories = snapshot.getValue(Categories.class);
-                    Glide.with(context).load(categories.getCategoryImage()).into(holder.imageView);
+//                    Glide.with(context).load(categories.getCategoryImage()).into(holder.imageView);
                 } else {
                     Toast.makeText(context, "Error db", Toast.LENGTH_SHORT).show();
                 }
