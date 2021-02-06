@@ -33,7 +33,7 @@ public class HomeDemo extends AppCompatActivity {
     ImageView home, addimg, profile, rightImage, ThreeDotImage;
     ViewPager viewPager;
     TextView thome, taddimage, tprofile, toolbarName;
-    FirebaseAuth  firebaseAuth;
+    FirebaseAuth firebaseAuth;
     private PageViewAdater pageViewAdater;
     String userid;
     FirebaseUser firebaseUser;
@@ -43,9 +43,9 @@ public class HomeDemo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_demo);
 
-        firebaseAuth=FirebaseAuth.getInstance();
-        userid=firebaseAuth.getCurrentUser().getUid();
-        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
+        firebaseAuth = FirebaseAuth.getInstance();
+        userid = firebaseAuth.getCurrentUser().getUid();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         viewPager = findViewById(R.id.frame);
         toolbarName = findViewById(R.id.textView12);
         linearLayout = findViewById(R.id.linearLayout);
@@ -53,14 +53,11 @@ public class HomeDemo extends AppCompatActivity {
         frameLayout = findViewById(R.id.frameNav);
         Initialazationdmodule();
         Initialazationdmodulefornavigation();
-
-
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-
 
         if (id == R.id.third) {
             dLayout.openDrawer(Gravity.RIGHT);
@@ -86,14 +83,12 @@ public class HomeDemo extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId(); // get selected menu item's id
 // check selected menu item's id and replace a Fragment Accordingly
-//               if(itemId == R.id.first){
-//                   startActivity(new Intent(HomeDemo.this,FindFriend.class));
-//               } else
-                   if (itemId == R.id.second) {
-                    startActivity(new Intent(HomeDemo.this,SaveData.class));
+
+                if (itemId == R.id.second) {
+                    startActivity(new Intent(HomeDemo.this, SaveData.class));
                 } else if (itemId == R.id.third) {
-                   firebaseAuth.signOut();
-                       startActivity(new Intent(HomeDemo.this,HomeDemo.class));
+                    firebaseAuth.signOut();
+                    startActivity(new Intent(HomeDemo.this, MainActivity.class));
                 }
 
                 dLayout.closeDrawers();
@@ -121,7 +116,7 @@ public class HomeDemo extends AppCompatActivity {
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toolbarName.setText("Instagram");
+                toolbarName.setText("Home");
                 viewPager.setCurrentItem(0);
                 FragmentManager fm = getFragmentManager();
                 android.app.FragmentTransaction fragmentTransaction = fm.beginTransaction();
@@ -177,20 +172,35 @@ public class HomeDemo extends AppCompatActivity {
 
         if (position == 0) {
             home.setColorFilter(getApplication().getColor(R.color.purple_500));
+            thome.setTextColor(getApplication().getColor(R.color.purple_500));
+
             addimg.setColorFilter(getApplication().getColor(R.color.black));
+            taddimage.setTextColor(getApplication().getColor(R.color.black));
+
             profile.setColorFilter(getApplication().getColor(R.color.black));
+            tprofile.setTextColor(getApplication().getColor(R.color.black));
         }
 
         if (position == 1) {
             home.setColorFilter(getApplication().getColor(R.color.black));
+            thome.setTextColor(getApplication().getColor(R.color.black));
+
             addimg.setColorFilter(getApplication().getColor(R.color.purple_500));
+            taddimage.setTextColor(getApplication().getColor(R.color.purple_500));
+
             profile.setColorFilter(getApplication().getColor(R.color.black));
+            tprofile.setTextColor(getApplication().getColor(R.color.black));
         }
 
         if (position == 2) {
             home.setColorFilter(getApplication().getColor(R.color.black));
+            thome.setTextColor(getApplication().getColor(R.color.black));
+
             addimg.setColorFilter(getApplication().getColor(R.color.black));
+            taddimage.setTextColor(getApplication().getColor(R.color.black));
+
             profile.setColorFilter(getApplication().getColor(R.color.purple_500));
+            tprofile.setTextColor(getApplication().getColor(R.color.purple_500));
         }
     }
 

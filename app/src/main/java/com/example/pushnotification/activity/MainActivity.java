@@ -16,6 +16,7 @@ import com.example.pushnotification.fragment.HomeFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,9 +28,10 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
     DatabaseReference databaseReference;
-    EditText name,password;
-    TextView textView;
+    TextInputLayout name, password;
+    TextView textView, forgetpassword;
     Button next;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,58 +40,53 @@ public class MainActivity extends AppCompatActivity {
         initFireabse();
         init();
 
-        firebaseUser=firebaseAuth.getCurrentUser();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
-        if(firebaseUser !=null){
-            Intent intent=new Intent(MainActivity.this,HomeDemo.class);
+        if (firebaseUser != null) {
+            Intent intent = new Intent(MainActivity.this, HomeDemo.class);
             startActivity(intent);
-
         }
-
-
     }
 
     private void initFireabse() {
-        firebaseAuth=FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("User");
     }
 
     private void init() {
 
-        name=findViewById(R.id.editTextTextPersonName);
-        password=findViewById(R.id.editTextTextPersonName2);
-        textView=findViewById(R.id.textView);
-        next=findViewById(R.id.button);
+        name = findViewById(R.id.editTextTextPersonName);
+        password = findViewById(R.id.editTextTextPersonName2);
+        textView = findViewById(R.id.textView);
+        forgetpassword = findViewById(R.id.textView14);
+        next = findViewById(R.id.button);
+
+        forgetpassword.setVisibility(View.INVISIBLE);
 
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this,SignUp.class));
+                startActivity(new Intent(MainActivity.this, SignUp.class));
             }
         });
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 save();
-
             }
         });
-
     }
 
     private void save() {
-
-            firebaseAuth.signInWithEmailAndPassword(name.getText().toString(), password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-
-                        Intent intent=new Intent(MainActivity.this,HomeDemo.class);
-                        startActivity(intent);
-                    }
+        firebaseAuth.signInWithEmailAndPassword(name.getEditText().getText().toString(), password.getEditText().getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Intent intent = new Intent(MainActivity.this, HomeDemo.class);
+                    startActivity(intent);
                 }
-            });
+            }
+        });
     }
 }

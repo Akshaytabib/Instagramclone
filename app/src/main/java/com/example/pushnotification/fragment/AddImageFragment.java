@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -52,7 +53,7 @@ public class AddImageFragment extends Fragment {
     //
     ImageView Iback, Inext;
     ImageView  Iaddimgs;
-    EditText comment;
+    TextInputLayout comment;
     FirebaseAuth firebaseAuth;
     String userlocalid;
 
@@ -161,7 +162,7 @@ public class AddImageFragment extends Fragment {
                         myUrl = downloaduri.toString();
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("AddImage");
 
-                        String name = comment.getText().toString();
+                        String name = comment.getEditText().getText().toString();
 
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("addimageId",userlocalid);

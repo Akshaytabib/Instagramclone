@@ -97,13 +97,14 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
 
         @Override
         public void onClick(View view) {
-            int position = getAdapterPosition();
+            final int position = getAdapterPosition();
             Toast.makeText(context, "Position" + position, Toast.LENGTH_SHORT).show();
 
             heart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     count = count + 1;
+                    like.setVisibility(View.VISIBLE);
                     like.setText(String.valueOf(count));
                     red_heart.setVisibility(View.VISIBLE);
                     heart.setVisibility(View.INVISIBLE);
@@ -133,6 +134,7 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
                 @Override
                 public void onClick(View view) {
                     count = count - 1;
+                    like.setVisibility(View.VISIBLE);
                     like.setText(String.valueOf(count));
                     heart.setVisibility(View.VISIBLE);
                     red_heart.setVisibility(View.INVISIBLE);
@@ -180,17 +182,17 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
                 @Override
                 public void onClick(View view) {
 
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Save").child(userId);
-                    databaseReference.child("SaveID").removeValue();
+//                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Save").child(userId);
+//                    databaseReference.child("SaveID").removeValue();
                     save.setVisibility(View.VISIBLE);
-                    Toast.makeText(context, "Delete", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "Delete", Toast.LENGTH_SHORT).show();
 
                 }
             });
         }
     }
 
-    private void retriveName(ViewHolder holder) {
+    private void retriveName(final ViewHolder holder) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("User").child(userId);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -207,7 +209,7 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
         });
     }
 
-    private void retriveImage(ViewHolder holder) {
+    private void retriveImage(final ViewHolder holder) {
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Categories").child(userId);
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -216,7 +218,6 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
                 if (snapshot.exists()) {
                     categories = snapshot.getValue(Categories.class);
                     Glide.with(context).load(categories.getCategoryImage()).into(holder.profile);
-//              Glide.with(context).load(snapshot.child("categoryImage").getValue().toString()).into(holder.profile);
                 } else {
                     Toast.makeText(context, "Error db", Toast.LENGTH_SHORT).show();
                 }
@@ -229,5 +230,4 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
         });
 
     }
-
 }

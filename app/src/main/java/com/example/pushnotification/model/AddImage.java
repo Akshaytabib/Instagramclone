@@ -14,6 +14,15 @@ public class AddImage implements Parcelable {
         this.addimageFeed = addimageFeed;
     }
 
+    @Override
+    public String toString() {
+        return "AddImage{" +
+                "addimageId='" + addimageId + '\'' +
+                ", addimageurl='" + addimageurl + '\'' +
+                ", addimageFeed='" + addimageFeed + '\'' +
+                '}';
+    }
+
     public AddImage(String addimageId, String addimageurl, String addimageFeed) {
         this.addimageId = addimageId;
         this.addimageurl = addimageurl;

@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,7 +39,7 @@ public class SignUp extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth;
     DatabaseReference databaseReference;
-    EditText name,email,password;
+    TextInputLayout name, email, password, mobilenumber;
     Button next;
     String userId;
 
@@ -47,8 +48,8 @@ public class SignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        firebaseAuth=FirebaseAuth.getInstance();
-        databaseReference=FirebaseDatabase.getInstance().getReference("User");
+        firebaseAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference("User");
 
         init();
 
@@ -56,32 +57,33 @@ public class SignUp extends AppCompatActivity {
 
     private void init() {
 
-        name=findViewById(R.id.editTextTextPersonName4);
-        email=findViewById(R.id.editTextTextPersonName5);
-        password=findViewById(R.id.editTextTextPersonName6);
-        next=findViewById(R.id.btnone);
+        name = findViewById(R.id.editTextTextPersonName4);
+        email = findViewById(R.id.editTextTextPersonName5);
+        password = findViewById(R.id.editTextTextPersonName6);
+        mobilenumber = findViewById(R.id.editTextTextPersonName12);
+        next = findViewById(R.id.btnone);
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String username=name.getText().toString().trim();
-                final String useremail=email.getText().toString().trim();
-                final String userpassword=password.getText().toString().trim();
-
-                firebaseAuth.createUserWithEmailAndPassword(useremail,userpassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                final String username = name.getEditText().getText().toString().trim();
+                final String useremail = email.getEditText().getText().toString().trim();
+                final String userpassword = password.getEditText().getText().toString().trim();
+                final String usermobilenumber = mobilenumber.getEditText().getText().toString().trim();
+                firebaseAuth.createUserWithEmailAndPassword(useremail, userpassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             Toast.makeText(SignUp.this, "Successful", LENGTH_SHORT).show();
-                            userId=firebaseAuth.getCurrentUser().getUid();
+                            userId = firebaseAuth.getCurrentUser().getUid();
 
                             HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("userid",userId);
+                            hashMap.put("userid", userId);
                             hashMap.put("userName", username);
-                            hashMap.put("userEmail",useremail);
+                            hashMap.put("userEmail", useremail);
                             hashMap.put("userPasswrd", userpassword);
-
+                            hashMap.put("usermobilenumber", usermobilenumber);
 
                             databaseReference.child(userId).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -90,10 +92,9 @@ public class SignUp extends AppCompatActivity {
                                     Toast.makeText(SignUp.this, "user register", LENGTH_SHORT).show();
                                 }
                             });
-                        }else {
+                        } else {
                             Toast.makeText(SignUp.this, "Unsucessful", LENGTH_SHORT).show();
                         }
-
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

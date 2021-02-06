@@ -12,7 +12,7 @@
             android:visible="false"/>
         <item
             android:id="@+id/second"
-            android:icon="@drawable/ic_baseline_check_24"
+            android:icon="@drawable/newwhitecheck"
             app:showAsAction="always"
             android:title="Save" />
         <item

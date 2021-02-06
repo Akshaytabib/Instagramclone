@@ -152,7 +152,6 @@ public class EditProfile extends AppCompatActivity {
                 Toast.makeText(EditProfile.this, "Sucessful", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     private void storeImage() {
