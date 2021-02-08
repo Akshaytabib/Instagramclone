@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pushnotification.R;
 import com.example.pushnotification.fragment.HomeFragment;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     TextInputLayout name, password;
     TextView textView, forgetpassword;
     Button next;
+    String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,14 +81,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void save() {
-        firebaseAuth.signInWithEmailAndPassword(name.getEditText().getText().toString(), password.getEditText().getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Intent intent = new Intent(MainActivity.this, HomeDemo.class);
-                    startActivity(intent);
+
+        String username=name.getEditText().getText().toString().trim();
+        String passwords= password.getEditText().getText().toString();
+
+        if(username.isEmpty()){
+            Toast.makeText(this, "enter email id", Toast.LENGTH_SHORT).show();
+        } else if(username.matches(emailPattern)){
+            Toast.makeText(this, "enter valid email id", Toast.LENGTH_SHORT).show();
+        }
+        else if(passwords.isEmpty()){
+            Toast.makeText(this, "enter password", Toast.LENGTH_SHORT).show();
+        } else {
+
+            firebaseAuth.signInWithEmailAndPassword(username, passwords).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        Intent intent = new Intent(MainActivity.this, HomeDemo.class);
+                        startActivity(intent);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }

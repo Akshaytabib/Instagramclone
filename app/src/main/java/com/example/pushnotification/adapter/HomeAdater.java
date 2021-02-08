@@ -17,6 +17,7 @@ import com.example.pushnotification.R;
 import com.example.pushnotification.activity.HomeDemo;
 import com.example.pushnotification.model.AddImage;
 import com.example.pushnotification.model.Categories;
+import com.example.pushnotification.model.Like;
 import com.example.pushnotification.model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,11 +39,11 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
     FirebaseAuth firebaseAuth;
     String userId;
     User user;
-    //    ArrayList<Categories> categories;
     Categories categories;
+    Like likess;
     AddImage addImage;
     int count = 0;
-
+    String localuseridforlike;
     public HomeAdater(FragmentActivity activity, ArrayList<AddImage> arrayList) {
         this.context = activity;
         this.arrayList = arrayList;
@@ -98,7 +99,7 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
         @Override
         public void onClick(View view) {
             final int position = getAdapterPosition();
-            Toast.makeText(context, "Position" + position, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Position" + position, Toast.LENGTH_SHORT).show();
 
             heart.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -134,12 +135,30 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
                 @Override
                 public void onClick(View view) {
                     count = count - 1;
-                    like.setVisibility(View.VISIBLE);
                     like.setText(String.valueOf(count));
                     heart.setVisibility(View.VISIBLE);
                     red_heart.setVisibility(View.INVISIBLE);
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Like").child(userId);
-                    databaseReference.child("SaveID").removeValue();
+//                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Like").child(userId);
+// //                   databaseReference.child("SaveID").removeValue();
+//
+//                    databaseReference.addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                            if (snapshot.exists()) {
+//                                likess = snapshot.getValue(Like.class);
+//                            } else {
+//                    Toast.makeText(context, "Error db", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError error) {
+//                            Toast.makeText(context, "Failed load image", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//
+//                    localuseridforlike=likess.getLikeID();
+//                    databaseReference.child(localuseridforlike).removeValue();
 
                 }
             });
@@ -204,7 +223,7 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(context, "Faid to show userName", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Fail to show userName", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -219,7 +238,7 @@ public class HomeAdater extends RecyclerView.Adapter<HomeAdater.ViewHolder> {
                     categories = snapshot.getValue(Categories.class);
                     Glide.with(context).load(categories.getCategoryImage()).into(holder.profile);
                 } else {
-                    Toast.makeText(context, "Error db", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "Error db", Toast.LENGTH_SHORT).show();
                 }
             }
 

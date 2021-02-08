@@ -43,6 +43,8 @@ public class HomeDemo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_demo);
 
+
+
         firebaseAuth = FirebaseAuth.getInstance();
         userid = firebaseAuth.getCurrentUser().getUid();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -53,6 +55,7 @@ public class HomeDemo extends AppCompatActivity {
         frameLayout = findViewById(R.id.frameNav);
         Initialazationdmodule();
         Initialazationdmodulefornavigation();
+
     }
 
     @Override

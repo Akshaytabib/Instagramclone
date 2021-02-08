@@ -3,6 +3,7 @@ package com.example.pushnotification.adapter;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -14,6 +15,9 @@ import com.example.pushnotification.fragment.HomeFragment;
 import com.example.pushnotification.fragment.ProfileFragment;
 
 public class PageViewAdater extends FragmentPagerAdapter {
+
+    private String tabTitles[] = new String[] { "Home", "New Post", "Profile" };
+
 
     public PageViewAdater(FragmentManager supportFragmentManager) {
         super(supportFragmentManager);
@@ -45,4 +49,9 @@ public class PageViewAdater extends FragmentPagerAdapter {
         return 3;
     }
 
+    @Override
+    public CharSequence getPageTitle(int position) {
+        // Generate title based on item position
+        return tabTitles[position];
+    }
 }

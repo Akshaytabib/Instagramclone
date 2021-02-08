@@ -63,7 +63,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
         public void onClick(View view) {
 
             int postion = getAdapterPosition();
-            Toast.makeText(context, "postion"+postion, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "postion"+postion, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(context , UserPost.class);
             intent.putExtra("key", (Parcelable) arrayList.get(postion));
             context.startActivity(intent);

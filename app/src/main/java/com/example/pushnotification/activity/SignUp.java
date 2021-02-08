@@ -32,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -42,7 +44,9 @@ public class SignUp extends AppCompatActivity {
     TextInputLayout name, email, password, mobilenumber;
     Button next;
     String userId;
-
+    String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+    String pattern = "^\\s*(?:\\+?(\\d{1,3}))?[-. (]*(\\d{3})[-. )]*(\\d{3})[-. ]*(\\d{4})(?: *x(\\d+))?\\s*$";
+    Matcher m;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,8 +77,21 @@ public class SignUp extends AppCompatActivity {
                 firebaseAuth.createUserWithEmailAndPassword(useremail, userpassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-
-                        if (task.isSuccessful()) {
+                        Pattern r = Pattern.compile(pattern);
+                        m = r.matcher(usermobilenumber);
+                        if(username.isEmpty()){
+                            Toast.makeText(SignUp.this, "enter userName", LENGTH_SHORT).show();
+                        }else if(useremail.isEmpty()){
+                            Toast.makeText(SignUp.this, "enter EmailAddress", LENGTH_SHORT).show();
+                        }else if(!useremail.matches(emailPattern)){
+                            Toast.makeText(SignUp.this, "Enter correct emailid", LENGTH_SHORT).show();
+                        }else if(userpassword.isEmpty()){
+                            Toast.makeText(SignUp.this, "enter Password", LENGTH_SHORT).show();
+                        }else if(usermobilenumber.isEmpty()) {
+                            Toast.makeText(SignUp.this, "enter mobile number", LENGTH_SHORT).show();
+                        }else if(!m.find()){
+                            Toast.makeText(SignUp.this, "enter 10 digit Mobile number", LENGTH_SHORT).show();
+                        } else if (task.isSuccessful()) {
                             Toast.makeText(SignUp.this, "Successful", LENGTH_SHORT).show();
                             userId = firebaseAuth.getCurrentUser().getUid();
 
