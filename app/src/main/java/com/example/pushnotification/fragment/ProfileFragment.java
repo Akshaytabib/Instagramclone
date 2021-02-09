@@ -1,6 +1,9 @@
 package com.example.pushnotification.fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -111,37 +115,42 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        profile = (view).findViewById(R.id.imageView11);
-        editprofile = (view).findViewById(R.id.button2);
-        name = (view).findViewById(R.id.textView8);
-        recyclerView = (view).findViewById(R.id.recyclerView);
-        GridLayoutManager manager = new GridLayoutManager(getActivity(), 3, GridLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(manager);
-        recyclerView.setHasFixedSize(true);
-        arrayList = new ArrayList<AddImage>();
-        firebaseAuth = FirebaseAuth.getInstance();
-        userid = firebaseAuth.getCurrentUser().getUid();
-        databaseReference = FirebaseDatabase.getInstance().getReference("AddImage").child(userid);
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    AddImage data = dataSnapshot.getValue(AddImage.class);
-                    arrayList.add(data);
-                    profileAdapter = new ProfileAdapter(getActivity(), arrayList);
-                    recyclerView.setAdapter(profileAdapter);
+
+        if (isConnected()) {
+
+            profile = (view).findViewById(R.id.imageView11);
+            editprofile = (view).findViewById(R.id.button2);
+            name = (view).findViewById(R.id.textView8);
+            recyclerView = (view).findViewById(R.id.recyclerView);
+            GridLayoutManager manager = new GridLayoutManager(getActivity(), 3, GridLayoutManager.VERTICAL, false);
+            recyclerView.setLayoutManager(manager);
+            recyclerView.setHasFixedSize(true);
+            arrayList = new ArrayList<AddImage>();
+            firebaseAuth = FirebaseAuth.getInstance();
+            userid = firebaseAuth.getCurrentUser().getUid();
+            databaseReference = FirebaseDatabase.getInstance().getReference("AddImage").child(userid);
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        AddImage data = dataSnapshot.getValue(AddImage.class);
+                        arrayList.add(data);
+                        profileAdapter = new ProfileAdapter(getActivity(), arrayList);
+                        recyclerView.setAdapter(profileAdapter);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getActivity(), "Opps something went to wrong", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(getActivity(), "Opps something went to wrong", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-        retriveName();
-        retriveImage();
-
+            retriveName();
+            retriveImage();
+        } else {
+            Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+        }
 
         editprofile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,4 +197,19 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
+
+
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+    }
+
 }

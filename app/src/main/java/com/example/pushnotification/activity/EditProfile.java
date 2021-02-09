@@ -5,9 +5,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
@@ -62,13 +66,18 @@ public class EditProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
-        InitUi();
-        firebaseAuth = FirebaseAuth.getInstance();
-        userId = firebaseAuth.getCurrentUser().getUid();
-        storageReference = FirebaseStorage.getInstance().getReference("ProfileImage");
-        retriveName();
-        retriveImage();
+        if(isConnected()) {
 
+
+            InitUi();
+            firebaseAuth = FirebaseAuth.getInstance();
+            userId = firebaseAuth.getCurrentUser().getUid();
+            storageReference = FirebaseStorage.getInstance().getReference("ProfileImage");
+            retriveName();
+            retriveImage();
+        }else{
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void InitUi() {
@@ -216,6 +225,20 @@ public class EditProfile extends AppCompatActivity {
             Toast.makeText(this, "An Error Ocurred!", Toast.LENGTH_SHORT).show();
             finish();
         }
+    }
+
+
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
     }
 
 }

@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -42,11 +45,16 @@ public class SignUp extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     DatabaseReference databaseReference;
     TextInputLayout name, email, password, mobilenumber;
+    String username;
+    String useremail;
+    String userpassword;
+    String usermobilenumber;
     Button next;
     String userId;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     String pattern = "^\\s*(?:\\+?(\\d{1,3}))?[-. (]*(\\d{3})[-. )]*(\\d{3})[-. ]*(\\d{4})(?: *x(\\d+))?\\s*$";
     Matcher m;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +63,11 @@ public class SignUp extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("User");
 
-        init();
-
+        if (isConnected()) {
+            init();
+        } else {
+            Toast.makeText(getApplicationContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void init() {
@@ -67,59 +78,97 @@ public class SignUp extends AppCompatActivity {
         mobilenumber = findViewById(R.id.editTextTextPersonName12);
         next = findViewById(R.id.btnone);
 
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final String username = name.getEditText().getText().toString().trim();
-                final String useremail = email.getEditText().getText().toString().trim();
-                final String userpassword = password.getEditText().getText().toString().trim();
-                final String usermobilenumber = mobilenumber.getEditText().getText().toString().trim();
-                firebaseAuth.createUserWithEmailAndPassword(useremail, userpassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Pattern r = Pattern.compile(pattern);
-                        m = r.matcher(usermobilenumber);
-                        if(username.isEmpty()){
-                            Toast.makeText(SignUp.this, "enter userName", LENGTH_SHORT).show();
-                        }else if(useremail.isEmpty()){
-                            Toast.makeText(SignUp.this, "enter EmailAddress", LENGTH_SHORT).show();
-                        }else if(!useremail.matches(emailPattern)){
-                            Toast.makeText(SignUp.this, "Enter correct emailid", LENGTH_SHORT).show();
-                        }else if(userpassword.isEmpty()){
-                            Toast.makeText(SignUp.this, "enter Password", LENGTH_SHORT).show();
-                        }else if(usermobilenumber.isEmpty()) {
-                            Toast.makeText(SignUp.this, "enter mobile number", LENGTH_SHORT).show();
-                        }else if(!m.find()){
-                            Toast.makeText(SignUp.this, "enter 10 digit Mobile number", LENGTH_SHORT).show();
-                        } else if (task.isSuccessful()) {
-                            Toast.makeText(SignUp.this, "Successful", LENGTH_SHORT).show();
-                            userId = firebaseAuth.getCurrentUser().getUid();
+        if(isConnected()) {
 
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("userid", userId);
-                            hashMap.put("userName", username);
-                            hashMap.put("userEmail", useremail);
-                            hashMap.put("userPasswrd", userpassword);
-                            hashMap.put("usermobilenumber", usermobilenumber);
+            next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    username = name.getEditText().getText().toString().trim();
+                    useremail = email.getEditText().getText().toString().trim();
+                    userpassword = password.getEditText().getText().toString().trim();
+                    usermobilenumber = mobilenumber.getEditText().getText().toString().trim();
 
-                            databaseReference.child(userId).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    startActivity(new Intent(SignUp.this, HomeFragment.class));
-                                    Toast.makeText(SignUp.this, "user register", LENGTH_SHORT).show();
+                    if (validateData()) {
+                        firebaseAuth.createUserWithEmailAndPassword(useremail, userpassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(SignUp.this, "Successful", LENGTH_SHORT).show();
+                                    userId = firebaseAuth.getCurrentUser().getUid();
+
+                                    HashMap<String, Object> hashMap = new HashMap<>();
+                                    hashMap.put("userid", userId);
+                                    hashMap.put("userName", username);
+                                    hashMap.put("userEmail", useremail);
+                                    hashMap.put("userPasswrd", userpassword);
+                                    hashMap.put("usermobilenumber", usermobilenumber);
+
+                                    databaseReference.child(userId).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            startActivity(new Intent(SignUp.this, HomeFragment.class));
+                                            Toast.makeText(SignUp.this, "user register", LENGTH_SHORT).show();
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(SignUp.this, "Unsucessful", LENGTH_SHORT).show();
                                 }
-                            });
-                        } else {
-                            Toast.makeText(SignUp.this, "Unsucessful", LENGTH_SHORT).show();
-                        }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(SignUp.this, "Failed", LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(SignUp.this, "enter all field", LENGTH_SHORT).show();
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(SignUp.this, "Failed", LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
+                }
+            });
+        }else {
+            Toast.makeText(getApplicationContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+    }
+
+    public boolean validateData() {
+
+        Pattern r = Pattern.compile(pattern);
+        m = r.matcher(usermobilenumber);
+        if (username.isEmpty()) {
+            Toast.makeText(SignUp.this, "enter userName", LENGTH_SHORT).show();
+            return false;
+        } else if (useremail.isEmpty()) {
+            Toast.makeText(SignUp.this, "enter EmailAddress", LENGTH_SHORT).show();
+            return false;
+        } else if (!useremail.matches(emailPattern)) {
+            Toast.makeText(SignUp.this, "Enter correct emailid", LENGTH_SHORT).show();
+            return false;
+        } else if (userpassword.isEmpty()) {
+            Toast.makeText(SignUp.this, "enter Password", LENGTH_SHORT).show();
+            return false;
+        } else if (usermobilenumber.isEmpty()) {
+            Toast.makeText(SignUp.this, "enter mobile number", LENGTH_SHORT).show();
+            return false;
+        } else if (!m.find()) {
+            Toast.makeText(SignUp.this, "enter 10 digit Mobile number", LENGTH_SHORT).show();
+            return false;
+        } else {
+            Toast.makeText(SignUp.this, "enter all the field", LENGTH_SHORT).show();
+        }
+        return true;
     }
 }

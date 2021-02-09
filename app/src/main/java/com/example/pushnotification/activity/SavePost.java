@@ -1,7 +1,11 @@
 package com.example.pushnotification.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,23 +43,29 @@ public class SavePost extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_post);
 
-        Intent intent = getIntent();
-        saves = intent.getParcelableExtra("SaveKey");
+        if(isConnected()) {
 
-        Initialazationdmodulefornavigation();
-        InitU();
-        firebaseAuth = FirebaseAuth.getInstance();
-        userId = firebaseAuth.getCurrentUser().getUid();
-        localid=saves.getSaveID();
+            Intent intent = getIntent();
+            saves = intent.getParcelableExtra("SaveKey");
 
-        Glide.with(this).load(saves.getSaveProfile()).thumbnail(0.5f)
-                .diskCacheStrategy(DiskCacheStrategy.ALL).into(feed);
-        Glide.with(this).load(saves.getSaveFeedimge()).thumbnail(0.5f)
-                .diskCacheStrategy(DiskCacheStrategy.ALL).into(profile);
-        feedstory.setText(saves.getSaveText());
-        like.setText(saves.getSaveLike());
-        bname.setText(saves.getSaveName());
-        name.setText(saves.getSaveuserName());
+            Initialazationdmodulefornavigation();
+            InitU();
+            firebaseAuth = FirebaseAuth.getInstance();
+            userId = firebaseAuth.getCurrentUser().getUid();
+            localid = saves.getSaveID();
+
+            Glide.with(this).load(saves.getSaveProfile()).thumbnail(0.5f)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL).into(feed);
+            Glide.with(this).load(saves.getSaveFeedimge()).thumbnail(0.5f)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL).into(profile);
+            feedstory.setText(saves.getSaveText());
+            like.setText(saves.getSaveLike());
+            bname.setText(saves.getSaveName());
+            name.setText(saves.getSaveuserName());
+
+        }else {
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -107,5 +117,18 @@ public class SavePost extends AppCompatActivity {
                 red_heart.setVisibility(View.INVISIBLE);
             }
         });
+    }
+
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
     }
 }

@@ -1,6 +1,9 @@
 package com.example.pushnotification.fragment;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -8,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -95,36 +100,54 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_home, container, false);
 
-        firebaseAuth=FirebaseAuth.getInstance();
-        userid=firebaseAuth.getCurrentUser().getUid();
+        if(isConnected()) {
+
+            firebaseAuth = FirebaseAuth.getInstance();
+            userid = firebaseAuth.getCurrentUser().getUid();
 
 
-        recyclerView=(view).findViewById(R.id.recyclerView1);
-        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(manager);
-        recyclerView.setHasFixedSize(true);
-        arrayList=new ArrayList<AddImage>();
+            recyclerView = (view).findViewById(R.id.recyclerView1);
+            LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+            recyclerView.setLayoutManager(manager);
+            recyclerView.setHasFixedSize(true);
+            arrayList = new ArrayList<AddImage>();
 
 
-        databaseReference= FirebaseDatabase.getInstance().getReference("AddImage").child(userid);
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot:snapshot.getChildren()){
-                    AddImage data=dataSnapshot.getValue(AddImage.class);
-                    arrayList.add(data);
-                    Collections.reverse(arrayList);
-                    homeAdater= new HomeAdater(getActivity(),arrayList);
-                    recyclerView.setAdapter(homeAdater);
-                    homeAdater.notifyDataSetChanged();
+            databaseReference = FirebaseDatabase.getInstance().getReference("AddImage").child(userid);
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        AddImage data = dataSnapshot.getValue(AddImage.class);
+                        arrayList.add(data);
+                        Collections.reverse(arrayList);
+                        homeAdater = new HomeAdater(getActivity(), arrayList);
+                        recyclerView.setAdapter(homeAdater);
+                        homeAdater.notifyDataSetChanged();
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getActivity(), "Opps something went to wrong", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(getActivity(), "Opps something went to wrong", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+        }
         return view;
     }
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+    }
+
 }

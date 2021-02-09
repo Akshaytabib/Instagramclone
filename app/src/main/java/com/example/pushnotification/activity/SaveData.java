@@ -5,7 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.pushnotification.R;
@@ -36,32 +40,50 @@ public class SaveData extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save);
 
-        firebaseAuth = FirebaseAuth.getInstance();
-        userid = firebaseAuth.getCurrentUser().getUid();
-        databaseReference = FirebaseDatabase.getInstance().getReference("Save").child(userid);
+        if(isConnected()) {
 
-        recyclerView=findViewById(R.id.recyclerView2);
-        GridLayoutManager manager = new GridLayoutManager(SaveData.this, 3, GridLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(manager);
-        recyclerView.setHasFixedSize(true);
-        arrayList = new ArrayList<Save>();
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Save data = dataSnapshot.getValue(Save.class);
-                    arrayList.add(data);
-                    Collections.reverse(arrayList);
-                    saveAdapter = new SaveAdapter(SaveData.this, arrayList);
-                    recyclerView.setAdapter(saveAdapter);
+            firebaseAuth = FirebaseAuth.getInstance();
+            userid = firebaseAuth.getCurrentUser().getUid();
+            databaseReference = FirebaseDatabase.getInstance().getReference("Save").child(userid);
+
+            recyclerView = findViewById(R.id.recyclerView2);
+            GridLayoutManager manager = new GridLayoutManager(SaveData.this, 3, GridLayoutManager.VERTICAL, false);
+            recyclerView.setLayoutManager(manager);
+            recyclerView.setHasFixedSize(true);
+            arrayList = new ArrayList<Save>();
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Save data = dataSnapshot.getValue(Save.class);
+                        arrayList.add(data);
+                        Collections.reverse(arrayList);
+                        saveAdapter = new SaveAdapter(SaveData.this, arrayList);
+                        recyclerView.setAdapter(saveAdapter);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(SaveData.this, "Opps something went to wrong", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(SaveData.this, "Opps something went to wrong", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            Toast.makeText(this, "No Internet COnnection", Toast.LENGTH_SHORT).show();
+        }
 
+    }
+
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
     }
 }

@@ -3,9 +3,13 @@ package com.example.pushnotification.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,21 +37,26 @@ public class MainActivity extends AppCompatActivity {
     TextView textView, forgetpassword;
     Button next;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
-
+    String username,passwords;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initFireabse();
-        init();
 
-        firebaseUser = firebaseAuth.getCurrentUser();
+        if (isConnected()) {
+            initFireabse();
+            init();
+            firebaseUser = firebaseAuth.getCurrentUser();
 
-        if (firebaseUser != null) {
-            Intent intent = new Intent(MainActivity.this, HomeDemo.class);
-            startActivity(intent);
+            if (firebaseUser != null) {
+                Intent intent = new Intent(MainActivity.this, HomeDemo.class);
+                startActivity(intent);
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
         }
+
     }
 
     private void initFireabse() {
@@ -75,34 +84,71 @@ public class MainActivity extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                save();
+                if (isConnected()) {
+                    save();
+                } else {
+                    Toast.makeText(getApplicationContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
     private void save() {
 
-        String username=name.getEditText().getText().toString().trim();
-        String passwords= password.getEditText().getText().toString();
+        username=name.getEditText().getText().toString().trim();
+        passwords= password.getEditText().getText().toString();
 
+       if( validateLogin()) {
+
+           firebaseAuth.signInWithEmailAndPassword(username, passwords).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+               @Override
+               public void onComplete(@NonNull Task<AuthResult> task) {
+                   if (task.isSuccessful()) {
+                       Intent intent = new Intent(MainActivity.this, HomeDemo.class);
+                       startActivity(intent);
+                   }
+               }
+           });
+       }else {
+           Toast.makeText(this, "enter email and password", Toast.LENGTH_SHORT).show();
+       }
+
+    }
+
+    public boolean validateLogin() {
         if(username.isEmpty()){
             Toast.makeText(this, "enter email id", Toast.LENGTH_SHORT).show();
-        } else if(username.matches(emailPattern)){
+            return false;
+        } else if(!username.matches(emailPattern)){
             Toast.makeText(this, "enter valid email id", Toast.LENGTH_SHORT).show();
+            return false;
         }
         else if(passwords.isEmpty()){
             Toast.makeText(this, "enter password", Toast.LENGTH_SHORT).show();
-        } else {
+            return false;
+        }
+        return true;
+    }
 
-            firebaseAuth.signInWithEmailAndPassword(username, passwords).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        Intent intent = new Intent(MainActivity.this, HomeDemo.class);
-                        startActivity(intent);
-                    }
-                }
-            });
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        if(firebaseUser != null){
+            startActivity(new Intent(MainActivity.this,HomeDemo.class));
         }
     }
 }

@@ -3,9 +3,13 @@ package com.example.pushnotification.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -48,17 +52,24 @@ public class UserPost extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_post);
 
-        Initialazationdmodulefornavigation();
-        InitU();
-        firebaseAuth = FirebaseAuth.getInstance();
-        userId = firebaseAuth.getCurrentUser().getUid();
-        retriveImage();
-        retriveName();
-        Intent intent = getIntent();
-        addImage = intent.getParcelableExtra("key");
-        Glide.with(this).load(addImage.getAddimageurl()).thumbnail(0.5f)
-                .diskCacheStrategy(DiskCacheStrategy.ALL).into(feed);
-        feedstory.setText(addImage.getAddimageFeed());
+        if(isConnected()) {
+
+            Initialazationdmodulefornavigation();
+            InitU();
+            firebaseAuth = FirebaseAuth.getInstance();
+            userId = firebaseAuth.getCurrentUser().getUid();
+            retriveImage();
+            retriveName();
+            Intent intent = getIntent();
+            addImage = intent.getParcelableExtra("key");
+            Glide.with(this).load(addImage.getAddimageurl()).thumbnail(0.5f)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL).into(feed);
+            feedstory.setText(addImage.getAddimageFeed());
+
+        }else
+        {
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -132,4 +143,19 @@ public class UserPost extends AppCompatActivity {
         });
 
     }
+
+
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+    }
+
 }

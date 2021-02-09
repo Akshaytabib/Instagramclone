@@ -1,7 +1,10 @@
 package com.example.pushnotification.fragment;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -9,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -107,8 +111,11 @@ public class AddImageFragment extends Fragment {
 
         int id=item.getItemId();
         if(id == R.id.second){
-            Uploadimg();
-            Toast.makeText(getActivity(), "Hello", Toast.LENGTH_SHORT).show();
+            if(isConnected()) {
+                Uploadimg();
+            }else {
+                Toast.makeText(getActivity(), "No Internet connection", Toast.LENGTH_SHORT).show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -208,4 +215,19 @@ public class AddImageFragment extends Fragment {
             Toast.makeText(getContext(), "An Error Ocurred!", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    public boolean isConnected() {
+        boolean connected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+    }
+
 }

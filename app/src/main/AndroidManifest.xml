@@ -13,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PushNotification">
+        <activity android:name=".activity.MainActivity"></activity>
         <activity android:name=".activity.FindFriend" />
         <activity android:name=".activity.SaveData" />
         <activity android:name=".activity.UserPost" />
@@ -20,7 +21,7 @@
         <activity android:name=".activity.HomeDemo" />
         <activity android:name=".activity.EditProfile" />
         <activity android:name=".activity.SignUp" />
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".activity.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
